@@ -1,0 +1,34 @@
+{
+  "name": "geolocation-tracker",
+  "version": "1.0.0",
+  "description": "App for live tracking of registered users.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bottom-Up-City/Geolocation-Tracker.git"
+  },
+  "keywords": [
+    "lefletjs",
+    "geolocation",
+    "tracking",
+    "angular",
+    "node.js",
+    "mongoDB"
+  ],
+  "author": "Omobolaji Koyi, Bottom-up.city",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Bottom-Up-City/Geolocation-Tracker/issues"
+  },
+  "homepage": "https://github.com/Bottom-Up-City/Geolocation-Tracker#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.15",
+    "nodemon": "^2.0.7"
+  }
+}
