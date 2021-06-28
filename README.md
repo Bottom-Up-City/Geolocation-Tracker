@@ -1,6 +1,6 @@
 # Geolocation-Tracker
 
-##Stack
+## Stack
 
 - Angular
 - MongoDB
