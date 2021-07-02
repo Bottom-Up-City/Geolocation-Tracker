@@ -15,6 +15,8 @@ import { RegisterComponent } from './register/register.component';
 import { Error404Component } from './error404/error404.component';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { MapComponent } from './map/map.component';
+import { AlertComponent } from './_components/alert.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -28,6 +30,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     LoginComponent,
     RegisterComponent,
     Error404Component,
+    MapComponent,
+    AlertComponent,
   ],
   imports: [
     BrowserModule,

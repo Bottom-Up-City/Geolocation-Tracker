@@ -1,0 +1,24 @@
+nav {
+  display: flex;
+  justify-content: space-between;
+}
+.login-register {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  li {
+    padding: 5px;
+  }
+}
+ul {
+  margin: unset;
+  a {
+    color: #000;
+  }
+}
+.brand-language {
+  a {
+    margin-right: 100px;
+  }
+}

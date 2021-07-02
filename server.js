@@ -8,11 +8,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.get("/posts", (req, res) => {
-  res.status(200).send({ mesage: "Hello World" });
-  //   res.send("<h1>Hello</h1>");
-});
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

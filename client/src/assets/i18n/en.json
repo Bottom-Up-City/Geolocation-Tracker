@@ -1,7 +1,11 @@
 {
-  "Buy": "Buy",
-  "myText": {
-    "test": "This is the text that I am trying to work with. I am just trying to acquire skills so that I can eligible for a job at the end of the day."
-  },
-  "appName": "Geolocation Tracker"
+  "appName": "Geolocation Tracker",
+  "welcome": "Welcome",
+  "logout": "Logout",
+  "login": "Login",
+  "register": "Register",
+  "map": {
+    "activeUsers": "Active Users",
+    "map": "map"
+  }
 }
