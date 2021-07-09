@@ -4,17 +4,17 @@
       <div class="row mb-3 d-flex justify-content-center">
         <button
           type="button"
-          [disabled]="tracking"
+          [disabled]="locationAccess"
           class="btn btn-outline-secondary w-auto mx-1"
-          (click)="enbleTracking()"
+          (click)="enableTracking($event)"
         >
           {{ "map.enableTracking" | translate }}
         </button>
         <button
           type="button"
-          [disabled]="!tracking"
+          [disabled]="!locationAccess"
           class="btn btn-outline-secondary w-auto mx-1"
-          (click)="disableTracking()"
+          (click)="disableTracking($event)"
         >
           {{ "map.disableTracking" | translate }}
         </button>
@@ -26,7 +26,6 @@
     <div class="map-container col-9 center">
       <!-- <h5>{{ "map.map" | translate }}</h5> -->
       <div id="map"></div>
-      <div id="newmap"></div>
     </div>
   </div>
 </div>
