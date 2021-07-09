@@ -16,7 +16,7 @@ To run the frontend part of the project:
 Setting up the database
 
 - Install [MongoDB](https://zarkom.net/blogs/how-to-install-mongodb-for-development-in-windows-3328) on windows
-- If you use a mac, search for resources on the internet on how to install MongoDB on mac.
+- If you use a mac, you can find installation instructions on the internet.
 - Install [MongoDB compass](https://www.mongodb.com/try/download/compass) for managing the database
 
 To run the backend part of the project:
