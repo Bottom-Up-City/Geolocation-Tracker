@@ -69,8 +69,8 @@ export class MapComponent implements OnInit, AfterViewInit {
       }
     ).addTo(this.map);
 
-    L.marker([this.latitude, this.longitude]).addTo(this.map);
-    console.log([this.latitude, this.longitude]);
+    let marker = L.marker([this.latitude, this.longitude]).addTo(this.map);
+    marker.bindPopup('I am a popup').openPopup();
 
     L.circle([this.latitude, this.longitude], {
       color: 'red',
