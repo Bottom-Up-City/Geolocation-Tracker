@@ -1,11 +1,32 @@
 <div class="">
   <div class="row">
-    <div class="users col-3 border">
-      <h5>{{ "map.activeUsers" | translate }}</h5>
+    <div class="users col-3">
+      <div class="row mb-3 d-flex justify-content-center">
+        <button
+          type="button"
+          [disabled]="tracking"
+          class="btn btn-outline-secondary w-auto mx-1"
+          (click)="enbleTracking()"
+        >
+          {{ "map.enableTracking" | translate }}
+        </button>
+        <button
+          type="button"
+          [disabled]="!tracking"
+          class="btn btn-outline-secondary w-auto mx-1"
+          (click)="disableTracking()"
+        >
+          {{ "map.disableTracking" | translate }}
+        </button>
+      </div>
+      <div class="row">
+        <h5>{{ "map.activeUsers" | translate }}</h5>
+      </div>
     </div>
-    <div class="map col-9 border center">
-      <h5>{{ "map.map" | translate }}</h5>
-      <div></div>
+    <div class="map-container col-9 center">
+      <!-- <h5>{{ "map.map" | translate }}</h5> -->
+      <div id="map"></div>
+      <div id="newmap"></div>
     </div>
   </div>
 </div>

@@ -6,6 +6,8 @@
   "register": "Register",
   "map": {
     "activeUsers": "Active Users",
-    "map": "map"
+    "map": "map",
+    "enableTracking": "Enable tracking",
+    "disableTracking": "Disable tracking"
   }
 }
