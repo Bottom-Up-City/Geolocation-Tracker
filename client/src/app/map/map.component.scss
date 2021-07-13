@@ -4,3 +4,10 @@
 #map {
   height: 100%;
 }
+::ng-deep .leaflet-routing-collapse-btn {
+  left: 1px !important;
+  top: unset !important;
+}
+::ng-deep .fa-hospital {
+  color: red;
+}

@@ -6,7 +6,6 @@
           type="button"
           [disabled]="locationAccess"
           class="btn btn-outline-secondary w-auto mx-1"
-          (click)="enableTracking($event)"
         >
           {{ "map.enableTracking" | translate }}
         </button>
@@ -14,7 +13,6 @@
           type="button"
           [disabled]="!locationAccess"
           class="btn btn-outline-secondary w-auto mx-1"
-          (click)="disableTracking($event)"
         >
           {{ "map.disableTracking" | translate }}
         </button>

@@ -1,6 +1,9 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import * as L from 'leaflet';
 import { icon, Marker } from 'leaflet';
+import 'leaflet-routing-machine';
+import * as L from 'leaflet';
+
+// import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 
 @Component({
   selector: 'app-map',
@@ -20,14 +23,13 @@ export class MapComponent implements OnInit, AfterViewInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.findMe();
     this.handlePermission();
     console.log([this.latitude, this.longitude]);
   }
 
   newMap(): void {
     // seting up the map
-    this.map = L.map('map');
+    this.map = L.map('map', {});
     // this.map = L.map('map').setView([this.latitude, this.longitude], 13);
 
     // Setting for using the default marker icon
@@ -47,7 +49,8 @@ export class MapComponent implements OnInit, AfterViewInit {
     Marker.prototype.options.icon = iconDefault;
 
     // tileLayers
-    L.tileLayer(
+    // mapbox street tile
+    var mapboxStreet = L.tileLayer(
       'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
       {
         attribution:
@@ -59,11 +62,44 @@ export class MapComponent implements OnInit, AfterViewInit {
         accessToken:
           'pk.eyJ1Ijoib21vYm9sYWppLWtveWkiLCJhIjoiY2txZm5weHFxMXJsajJ1b3ZhMjM1eWdkaCJ9.OpqdDwLtyeJdGpAiQFItUQ',
       }
-    ).addTo(this.map);
+    );
+    mapboxStreet.addTo(this.map);
+    //street tile
+    var googleStreets = L.tileLayer(
+      'http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+      {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      }
+    );
+    // googleStreets.addTo(this.map);
+    //Hybrid tile
+    var googleHybrid = L.tileLayer(
+      'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
+      {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      }
+    );
+    // googleHybrid.addTo(this.map);
+    //Terrain tile
+    var googleTerrain = L.tileLayer(
+      'http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+      {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      }
+    );
+    // googleTerrain.addTo(this.map);
 
     // custom fontawesome icon used as marker-icon
-    const fontAwesomeIcon = L.divIcon({
+    const userIcon = L.divIcon({
       html: '<i class="fas fa-university fa-3x"></i>',
+      iconSize: [20, 20],
+      className: 'myDivIcon',
+    });
+    const hospitalIcon = L.divIcon({
+      html: '<i class="fas fa-hospital fa-2x"></i>',
       iconSize: [20, 20],
       className: 'myDivIcon',
     });
@@ -106,21 +142,18 @@ export class MapComponent implements OnInit, AfterViewInit {
 
     // marker for Otto-von-Guericke University Magdeburg
     let OVGUmarker = L.marker([52.14008712768555, 11.643962860107422], {
-      icon: fontAwesomeIcon,
+      icon: userIcon,
     }).addTo(this.map);
     OVGUmarker.bindPopup('Otto-von-Guericke Universität').openPopup();
-    var ovguPopup = L.popup()
-      .setLatLng([52.14008712768555, 11.643962860107422])
-      .setContent('OVGU')
-      .openOn(this.map);
 
     // marker for Hochschule Magdeburg-Stendal
     let marker = L.marker([52.1401298, 11.6757769], {
-      icon: fontAwesomeIcon,
+      icon: userIcon,
     }).addTo(this.map);
     marker.bindPopup('Hochschule Magdeburg-Stendal').openPopup();
 
     // for tracking live location by setting watch to true and setting the view to the location of the user
+    let newLatLng: any;
     const onLocationFound = (e: any) => {
       this.latitude = e.latlng.lat;
       this.latitude = e.latlng.lng;
@@ -131,6 +164,7 @@ export class MapComponent implements OnInit, AfterViewInit {
         .bindPopup(`You are within ${radius} meter from this point`)
         .openPopup();
       L.circle(e.latlng, radius).addTo(this.map);
+      newLatLng = e.latlng;
     };
 
     this.map.on('locationfound', onLocationFound);
@@ -151,16 +185,82 @@ export class MapComponent implements OnInit, AfterViewInit {
     };
     this.map.on('click', onMapClick);
 
-    // Layer Groups
+    // First Layer Groups
+    var NordPark = L.marker([52.144658, 11.64302]).bindPopup('NordPark'),
+      MagdeburgHbf = L.marker([52.130449, 11.626732]).bindPopup(
+        'Magdeburg Hbf'
+      ),
+      Schoenebeck = L.marker([52.020406, 11.736177]).bindPopup('Schoenebeck'),
+      Wolfsburg = L.marker([52.42411, 10.780532]).bindPopup('Wolfsburg');
 
-    let littleton = L.marker([52.144658, 11.64302]).bindPopup('NordPark'),
-      denver = L.marker([52.130449, 11.626732]).bindPopup('Magdeburg Hbf'),
-      aurora = L.marker([52.020406, 11.736177]).bindPopup('Schoenebeck'),
-      golden = L.marker([52.42411, 10.780532]).bindPopup('Wolfsburg');
+    var cities: any = L.layerGroup([
+      NordPark,
+      MagdeburgHbf,
+      Schoenebeck,
+      Wolfsburg,
+    ]).addTo(this.map);
 
-    var cities = L.layerGroup([littleton, denver, aurora, golden]).addTo(
-      this.map
-    );
+    // Second Layer Groups (Hospitals)
+    var marienstift = L.marker([52.135769, 11.6007827], {
+        icon: hospitalIcon,
+      }).bindPopup('Hospital St. Marienstift Magdeburg GmbH'),
+      OVGUHospital = L.marker([52.1027384, 11.61544317], {
+        icon: hospitalIcon,
+      }).bindPopup(
+        'Magdeburg Hospital of the Otto-von-Guericke University Magdeburg'
+      ),
+      klinikumMagdeburg = L.marker([52.15751695, 11.58202892], {
+        icon: hospitalIcon,
+      }).bindPopup('Klinikum Magdeburg gemeinnützige GmbH'),
+      OVGUfrauenklinik = L.marker([52.12946185, 11.61773666], {
+        icon: hospitalIcon,
+      }).bindPopup(
+        'Otto-von-Guericke-Universität Magdeburg Universitätsfrauenklinik'
+      );
+
+    var hospitals: any = L.layerGroup([
+      marienstift,
+      OVGUHospital,
+      klinikumMagdeburg,
+      OVGUfrauenklinik,
+    ]).addTo(this.map);
+
+    // map layers control
+    var baseMaps = {
+      MapboxStreet: mapboxStreet,
+      GoogleStreets: googleStreets,
+      GoogleSatelite: googleHybrid,
+      GoogleTerrain: googleTerrain,
+    };
+
+    // marker control
+    var overlayMaps = {
+      cities: cities,
+      Hospitals: hospitals,
+      // 'Second Marker': secondMarker,
+    };
+    L.control
+      .layers(baseMaps, overlayMaps, { collapsed: true })
+      .addTo(this.map);
+
+    // Routing machine added
+    // The instruction for using routing can be found on https://chanakadrathnayaka.github.io/types-leaflet-routing-machine/
+    L.Routing.control({
+      router: L.Routing.osrmv1({
+        serviceUrl: `http://router.project-osrm.org/route/v1/`,
+      }),
+      showAlternatives: true,
+      // lineOptions: {styles: [{color: '#242c81', weight: 7}]},
+      fitSelectedRoutes: false,
+      // altLineOptions: {styles: [{color: '#ed6852', weight: 7}]},
+      show: false,
+      autoRoute: true,
+      routeWhileDragging: true,
+      waypoints: [
+        L.latLng(52.130449, 11.626732),
+        L.latLng(52.144658, 11.64302),
+      ],
+    }).addTo(this.map);
   }
 
   // showPosition(position: any) {
@@ -169,63 +269,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   //   console.log([this.latitude, this.longitude]);
   // }
 
-  findMe() {
-    // if (navigator.geolocation) {
-    //   navigator.geolocation.getCurrentPosition((position) => {
-    //     console.dir(position);
-    //     this.showPosition(position);
-    //     // this.showPosition(position);
-    //   });
-    // } else {
-    //   alert('Geolocation is not supported by this browser.');
-    // }
-  }
-
-  enableTracking(event: any) {
-    // if (this.permissionState == 'granted' && this.locationAccess) {
-    //   console.log(this.locationAccess);
-    //   navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-    //     console.log(result.state);
-    //     this.permissionState = result.state;
-    //     navigator.geolocation.getCurrentPosition((position) => {
-    //       console.log(position);
-    //     });
-    //   });
-
-    //   console.log(this.permissionState);
-    // }
-    // window.location.reload();
-    this.locationAccess = true;
-    console.log(this.locationAccess);
-  }
-
-  disableTracking(event: any) {
-    if (this.permissionState == 'denied' && !this.locationAccess) {
-    }
-    // window.location.reload();
-    this.locationAccess = false;
-    console.log(this.locationAccess);
-  }
-
-  // private initMap(): void {
-  //   this.map = L.map('map', {
-  //     center: [39.8282, -98.5795],
-  //     zoom: 3,
-  //   });
-
-  //   const tiles = L.tileLayer(
-  //     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  //     {
-  //       maxZoom: 18,
-  //       minZoom: 3,
-  //       attribution:
-  //         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  //     }
-  //   );
-
-  //   tiles.addTo(this.map);
-  // }
-
+  // Function to log geolocation status. Status is either granted, prompt, or denied
   handlePermission() {
     navigator.permissions.query({ name: 'geolocation' }).then((result) => {
       console.log(result);
@@ -255,6 +299,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   //     });
   // }
 
+  // The map function is executed here
   ngAfterViewInit() {
     this.newMap();
   }
