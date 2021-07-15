@@ -3,15 +3,13 @@ import { icon, Marker } from 'leaflet';
 import 'leaflet-routing-machine';
 import * as L from 'leaflet';
 
-// import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
-
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit, AfterViewInit {
-  @ViewChild('map') gmapElement: any;
+  // @ViewChild('map') gmapElement: any;
 
   locationAccess = true;
   permissionState: string = 'denied';
@@ -19,12 +17,15 @@ export class MapComponent implements OnInit, AfterViewInit {
   latitude: any;
   longitude: any;
   id: any;
+  address: any = '';
+  ArrayOfAddress: any = '';
 
   constructor() {}
 
   ngOnInit(): void {
     this.handlePermission();
     console.log([this.latitude, this.longitude]);
+    console.log(this.address);
   }
 
   newMap(): void {
@@ -183,7 +184,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     const onMapClick = (e: any) => {
       popup.setLatLng(e.latlng).setContent(`${e.latlng}`).openOn(this.map);
     };
-    this.map.on('click', onMapClick);
+    this.map.on('click', onMapClick); // leaflet click event
 
     // First Layer Groups
     var NordPark = L.marker([52.144658, 11.64302]).bindPopup('NordPark'),
@@ -243,17 +244,15 @@ export class MapComponent implements OnInit, AfterViewInit {
       .layers(baseMaps, overlayMaps, { collapsed: true })
       .addTo(this.map);
 
-    // Routing machine added
+    // Routing machine
     // The instruction for using routing can be found on https://chanakadrathnayaka.github.io/types-leaflet-routing-machine/
     L.Routing.control({
       router: L.Routing.osrmv1({
         serviceUrl: `http://router.project-osrm.org/route/v1/`,
       }),
       showAlternatives: true,
-      // lineOptions: {styles: [{color: '#242c81', weight: 7}]},
       fitSelectedRoutes: false,
-      // altLineOptions: {styles: [{color: '#ed6852', weight: 7}]},
-      show: false,
+      show: true,
       autoRoute: true,
       routeWhileDragging: true,
       waypoints: [
@@ -262,7 +261,37 @@ export class MapComponent implements OnInit, AfterViewInit {
       ],
     }).addTo(this.map);
   }
+  // Here we are using a keyup event to trigger the getAddress function, and a timeout of 2 seconds is
+  //to prevent calling addressSearch function everytime a key is pressed. The values entered into the input
+  //field are taking every 2 seconds after a keyup event is initiated.
+  getAddress() {
+    setTimeout(() => {
+      this.addressSearch();
+    }, 2000);
+  }
+  // we are converting the address string into a json data containing the full location of the address and its latitude and longitude
+  // using nominatin. the response is taken and saved in ArrayofAddress
+  addressSearch() {
+    let xmlhttp = new XMLHttpRequest();
+    let url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${this.address.trim()}`;
+    xmlhttp.onreadystatechange = () => {
+      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        let myArr = JSON.parse(xmlhttp.responseText);
+        for (let address of myArr) {
+          console.log(this.ArrayOfAddress.display_name);
+          this.ArrayOfAddress = address;
+        }
+      }
+    };
+    xmlhttp.open('GET', url, true);
+    xmlhttp.send();
+    console.log(url);
+  }
 
+  addressSearchResult(value: any) {
+    this.ArrayOfAddress = value;
+    console.log(this.ArrayOfAddress);
+  }
   // showPosition(position: any) {
   //   this.latitude = position.coords.latitude;
   //   this.longitude = position.coords.longitude;

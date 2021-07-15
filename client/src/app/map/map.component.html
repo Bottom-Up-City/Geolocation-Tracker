@@ -1,7 +1,7 @@
 <div class="">
   <div class="row">
     <div class="users col-3">
-      <div class="row mb-3 d-flex justify-content-center">
+      <!-- <div class="row mb-3 d-flex justify-content-center">
         <button
           type="button"
           [disabled]="locationAccess"
@@ -16,6 +16,22 @@
         >
           {{ "map.disableTracking" | translate }}
         </button>
+      </div> -->
+      <div class="row">
+        <label class="mb-2" for="address-lookup">Address Lookup</label>
+        <input
+          class="form-control"
+          type="text"
+          name="address-lookup"
+          id="address-lookup"
+          placeholder="Search address here"
+          [(ngModel)]="address"
+          (keyup)="getAddress()"
+        />
+        <div *ngIf="address">
+          {{ address }}
+          <!-- <div *ngFor="let list of address"></div> -->
+        </div>
       </div>
       <div class="row">
         <h5>{{ "map.activeUsers" | translate }}</h5>
