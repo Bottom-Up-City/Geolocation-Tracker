@@ -11,3 +11,38 @@
 ::ng-deep .fa-hospital {
   color: red;
 }
+.users {
+  overflow-y: auto;
+}
+.active-users {
+  margin-top: 10px;
+}
+.search-results {
+  padding-left: 0;
+  padding-right: 0;
+  border-radius: 5px;
+  // border: 1px solid #ced4da;
+  position: absolute;
+  z-index: 2000;
+  left: 27.5%;
+  top: 20%;
+  width: 400px;
+  background-color: azure;
+  li {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0;
+  }
+}
+.search-items {
+  cursor: pointer;
+  &:hover {
+    background-color: bisque;
+  }
+}
+ul {
+  padding-left: 0;
+}
+.route-input {
+  padding-left: 0 !important;
+}

@@ -2,6 +2,8 @@ import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { icon, Marker } from 'leaflet';
 import 'leaflet-routing-machine';
 import * as L from 'leaflet';
+import { ReplaySubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-map',
@@ -9,22 +11,35 @@ import * as L from 'leaflet';
   styleUrls: ['./map.component.scss'],
 })
 export class MapComponent implements OnInit, AfterViewInit {
-  // @ViewChild('map') gmapElement: any;
-
-  locationAccess = true;
-  permissionState: string = 'denied';
-  map: any;
-  latitude: any;
-  longitude: any;
+  // locationAccess = true;
+  // permissionState: string = 'denied';
+  map!: L.Map;
+  latitude$ = new ReplaySubject<number>();
+  longitude$ = new ReplaySubject<number>();
+  searchResult$ = new ReplaySubject<any>();
+  searchFrom$ = new ReplaySubject<any>();
+  searchTo$ = new ReplaySubject<any>();
+  latitude!: number;
+  longitude!: number;
   id: any;
   address: any = '';
   ArrayOfAddress: any = '';
+  searchFrom = '';
+  searchTo = '';
+  routeClicked = false;
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.handlePermission();
-    console.log([this.latitude, this.longitude]);
+    // this.handlePermission();
+    this.latitude$.subscribe((val) => {
+      console.log(`latitude: ${val}`);
+      this.latitude = val;
+    });
+    this.longitude$.subscribe((val) => {
+      console.log(`Longitude: ${val}`);
+      this.longitude = val;
+    });
     console.log(this.address);
   }
 
@@ -156,15 +171,14 @@ export class MapComponent implements OnInit, AfterViewInit {
     // for tracking live location by setting watch to true and setting the view to the location of the user
     let newLatLng: any;
     const onLocationFound = (e: any) => {
-      this.latitude = e.latlng.lat;
-      this.latitude = e.latlng.lng;
-      console.log(this.latitude);
+      this.latitude$.next(e.latlng.lat);
+      this.longitude$.next(e.latlng.lng);
       var radius = e.accuracy / 2;
       var marker = L.marker(e.latlng, { icon: redIcon })
         .addTo(this.map)
-        .bindPopup(`You are within ${radius} meter from this point`)
+        .bindPopup(`You`)
         .openPopup();
-      L.circle(e.latlng, radius).addTo(this.map);
+      // L.circle(e.latlng, radius).addTo(this.map);
       newLatLng = e.latlng;
     };
 
@@ -234,7 +248,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       GoogleTerrain: googleTerrain,
     };
 
-    // marker control
+    // marker controiconl
     var overlayMaps = {
       cities: cities,
       Hospitals: hospitals,
@@ -243,90 +257,95 @@ export class MapComponent implements OnInit, AfterViewInit {
     L.control
       .layers(baseMaps, overlayMaps, { collapsed: true })
       .addTo(this.map);
-
-    // Routing machine
-    // The instruction for using routing can be found on https://chanakadrathnayaka.github.io/types-leaflet-routing-machine/
-    L.Routing.control({
-      router: L.Routing.osrmv1({
-        serviceUrl: `http://router.project-osrm.org/route/v1/`,
-      }),
-      showAlternatives: true,
-      fitSelectedRoutes: false,
-      show: true,
-      autoRoute: true,
-      routeWhileDragging: true,
-      waypoints: [
-        L.latLng(52.130449, 11.626732),
-        L.latLng(52.144658, 11.64302),
-      ],
-    }).addTo(this.map);
   }
   // Here we are using a keyup event to trigger the getAddress function, and a timeout of 2 seconds is
   //to prevent calling addressSearch function everytime a key is pressed. The values entered into the input
   //field are taking every 2 seconds after a keyup event is initiated.
   getAddress() {
     setTimeout(() => {
-      this.addressSearch();
+      this.addressSearch(this.address);
     }, 2000);
   }
   // we are converting the address string into a json data containing the full location of the address and its latitude and longitude
   // using nominatin. the response is taken and saved in ArrayofAddress
-  addressSearch() {
-    let xmlhttp = new XMLHttpRequest();
-    let url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${this.address.trim()}`;
-    xmlhttp.onreadystatechange = () => {
-      if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        let myArr = JSON.parse(xmlhttp.responseText);
-        for (let address of myArr) {
-          console.log(this.ArrayOfAddress.display_name);
-          this.ArrayOfAddress = address;
-        }
+  addressSearch(location: string) {
+    let url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${location.trim()}`;
+    return this.http.get(url).subscribe((val) => {
+      let addressList = [];
+      for (let address of Object.entries(val)) {
+        addressList.push(address[1]);
+        this.searchResult$.next(addressList);
       }
-    };
-    xmlhttp.open('GET', url, true);
-    xmlhttp.send();
-    console.log(url);
-  }
-
-  addressSearchResult(value: any) {
-    this.ArrayOfAddress = value;
-    console.log(this.ArrayOfAddress);
-  }
-  // showPosition(position: any) {
-  //   this.latitude = position.coords.latitude;
-  //   this.longitude = position.coords.longitude;
-  //   console.log([this.latitude, this.longitude]);
-  // }
-
-  // Function to log geolocation status. Status is either granted, prompt, or denied
-  handlePermission() {
-    navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-      console.log(result);
-      if (result.state == 'granted') {
-        this.permissionState = result.state;
-        console.log(this.permissionState);
-      } else if (result.state == 'prompt') {
-        console.log(this.permissionState);
-      } else if (result.state == 'denied') {
-        this.permissionState = result.state;
-        console.log(this.permissionState);
-      }
-      result.onchange = function () {
-        console.log(result);
-      };
     });
   }
 
-  // report(state: any) {
-  //   console.log(`Permission ${state}`);
-  // }
-  // revokePermission() {
-  //   navigator.permissions
-  //     .revoke({ name: 'geolocation' })
-  //     .then((result: any) => {
-  //       console.log(result);
-  //     });
-  // }
+  addressSearchResult(address: any) {
+    this.address = address.display_name;
+    let addressMarker = L.marker([address.lat, address.lon], {}).addTo(
+      this.map
+    );
+    addressMarker
+      .bindPopup(
+        `<span>${address.display_name}</span><br><span>LatLng: ${address.lat}, ${address.lon}</span>`
+      )
+      .openPopup();
+    this.map.setView([address.lat, address.lon]);
+    this.searchResult$.next([]);
+  }
+  routeSearchInput(route: any) {
+    if (route == 'search-from') {
+      this.route(this.searchFrom);
+      this.searchFrom$.subscribe((val) => {
+        console.log(val);
+      });
+    } else if (route == 'search-to') {
+      this.route(this.searchTo);
+      this.searchTo$.subscribe((val) => {
+        console.log(val);
+      });
+    }
+  }
+  route(value: any) {
+    let url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${value.trim()}`;
+    return this.http.get(url).subscribe((val) => {
+      let newArray = [];
+      for (let address of Object.entries(val)) {
+        newArray.push(address[1]);
+      }
+      this.searchFrom$.next(newArray);
+      this.searchTo$.next(newArray);
+    });
+  }
+  routeFunction() {
+    if (!this.routeClicked) {
+      // Routing machine
+      // The instruction for using routing can be found on https://chanakadrathnayaka.github.io/types-leaflet-routing-machine/
+      L.Routing.control({
+        router: L.Routing.osrmv1({
+          serviceUrl: `http://router.project-osrm.org/route/v1/`,
+        }),
+        showAlternatives: true,
+        fitSelectedRoutes: false,
+        show: false,
+        autoRoute: true,
+        routeWhileDragging: true,
+        waypoints: [
+          L.latLng(52.130449, 11.626732),
+          L.latLng(52.144658, 11.64302),
+        ],
+      }).addTo(this.map);
+      this.routeClicked = !this.routeClicked;
+    }
+    if (this.routeClicked) {
+      return;
+    }
+  }
+  searchResultFrom(address: any) {
+    this.searchFrom = address.display_name;
+  }
+  searchResultTo(address: any) {
+    this.searchTo = address.display_name;
+  }
 
   // The map function is executed here
   ngAfterViewInit() {

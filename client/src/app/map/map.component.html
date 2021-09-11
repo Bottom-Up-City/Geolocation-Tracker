@@ -28,12 +28,73 @@
           [(ngModel)]="address"
           (keyup)="getAddress()"
         />
-        <div *ngIf="address">
-          {{ address }}
+        <div *ngIf="searchResult$ | async" class="search-results">
+          <ul
+            class="search-items"
+            *ngFor="let address of searchResult$ | async"
+          >
+            <li (click)="addressSearchResult(address)">
+              {{ address.display_name }}
+            </li>
+          </ul>
           <!-- <div *ngFor="let list of address"></div> -->
         </div>
       </div>
       <div class="row">
+        <label for="">Search Route</label>
+        <div class="col-5 route-input">
+          <input
+            #from
+            class="form-control"
+            type="text"
+            name="search-from"
+            id="search-from"
+            placeholder="from"
+            [(ngModel)]="searchFrom"
+            (keyup)="routeSearchInput(from.id)"
+          />
+          <div *ngIf="searchResult$ | async" class="search-results">
+            <ul
+              class="search-items"
+              *ngFor="let address of searchResult$ | async"
+            >
+              <li (click)="searchResultFrom(address)">
+                {{ address.display_name }}
+              </li>
+            </ul>
+            <!-- <div *ngFor="let list of address"></div> -->
+          </div>
+        </div>
+        <div class="col-5 route-input">
+          <input
+            #to
+            class="form-control"
+            type="text"
+            name="search-to"
+            id="search-to"
+            placeholder="to"
+            [(ngModel)]="searchTo"
+            (keyup)="routeSearchInput(to.id)"
+          />
+          <div *ngIf="searchResult$ | async" class="search-results">
+            <ul
+              class="search-items"
+              *ngFor="let address of searchResult$ | async"
+            >
+              <li (click)="searchResultTo(address)">
+                {{ address.display_name }}
+              </li>
+            </ul>
+            <!-- <div *ngFor="let list of address"></div> -->
+          </div>
+        </div>
+        <div class="col-2 px-0">
+          <button class="form-control" (click)="routeFunction()">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="row active-users">
         <h5>{{ "map.activeUsers" | translate }}</h5>
       </div>
     </div>
