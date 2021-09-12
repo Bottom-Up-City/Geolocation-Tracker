@@ -26,7 +26,10 @@ export class MapComponent implements OnInit, AfterViewInit {
   ArrayOfAddress: any = '';
   searchFrom = '';
   searchTo = '';
-  routeClicked = false;
+  searchFromLat!: number;
+  searchFromLon!: number;
+  searchToLat!: number;
+  searchToLon!: number;
 
   constructor(private http: HttpClient) {}
 
@@ -294,18 +297,12 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
   routeSearchInput(route: any) {
     if (route == 'search-from') {
-      this.route(this.searchFrom);
-      this.searchFrom$.subscribe((val) => {
-        console.log(val);
-      });
+      this.routeFrom(this.searchFrom);
     } else if (route == 'search-to') {
-      this.route(this.searchTo);
-      this.searchTo$.subscribe((val) => {
-        console.log(val);
-      });
+      this.routeTo(this.searchTo);
     }
   }
-  route(value: any) {
+  routeFrom(value: any) {
     let url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${value.trim()}`;
     return this.http.get(url).subscribe((val) => {
       let newArray = [];
@@ -313,38 +310,52 @@ export class MapComponent implements OnInit, AfterViewInit {
         newArray.push(address[1]);
       }
       this.searchFrom$.next(newArray);
+    });
+  }
+  routeTo(value: any) {
+    let url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${value.trim()}`;
+    return this.http.get(url).subscribe((val) => {
+      let newArray = [];
+      for (let address of Object.entries(val)) {
+        newArray.push(address[1]);
+      }
       this.searchTo$.next(newArray);
     });
   }
   routeFunction() {
-    if (!this.routeClicked) {
-      // Routing machine
-      // The instruction for using routing can be found on https://chanakadrathnayaka.github.io/types-leaflet-routing-machine/
-      L.Routing.control({
-        router: L.Routing.osrmv1({
-          serviceUrl: `http://router.project-osrm.org/route/v1/`,
-        }),
-        showAlternatives: true,
-        fitSelectedRoutes: false,
-        show: false,
-        autoRoute: true,
-        routeWhileDragging: true,
-        waypoints: [
-          L.latLng(52.130449, 11.626732),
-          L.latLng(52.144658, 11.64302),
-        ],
-      }).addTo(this.map);
-      this.routeClicked = !this.routeClicked;
-    }
-    if (this.routeClicked) {
+    if (!this.searchFrom && !this.searchTo) {
       return;
     }
+    // Routing machine
+    // The instruction for using routing can be found on https://chanakadrathnayaka.github.io/types-leaflet-routing-machine/
+    L.Routing.control({
+      router: L.Routing.osrmv1({
+        serviceUrl: `http://router.project-osrm.org/route/v1/`,
+      }),
+      showAlternatives: true,
+      fitSelectedRoutes: true,
+      show: false,
+      autoRoute: true,
+      routeWhileDragging: true,
+      waypoints: [
+        L.latLng(this.searchFromLat, this.searchFromLon),
+        L.latLng(this.searchToLat, this.searchToLon),
+      ],
+    }).addTo(this.map);
   }
   searchResultFrom(address: any) {
     this.searchFrom = address.display_name;
+    this.searchFromLat = address.lat;
+    this.searchFromLon = address.lon;
+    console.log([this.searchFromLat, this.searchFromLon]);
+    this.searchFrom$.next();
   }
   searchResultTo(address: any) {
     this.searchTo = address.display_name;
+    this.searchToLat = address.lat;
+    this.searchToLon = address.lon;
+    console.log([this.searchToLat, this.searchToLon]);
+    this.searchTo$.next();
   }
 
   // The map function is executed here

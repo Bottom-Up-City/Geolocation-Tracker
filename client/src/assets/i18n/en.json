@@ -8,6 +8,11 @@
     "activeUsers": "Active Users",
     "map": "map",
     "enableTracking": "Enable tracking",
-    "disableTracking": "Disable tracking"
+    "disableTracking": "Disable tracking",
+    "addressLookup": "Address Lookup",
+    "searchAddressHere": "Search Address Here",
+    "searchRoute": "Search Route",
+    "from": "from",
+    "to": "to"
   }
 }

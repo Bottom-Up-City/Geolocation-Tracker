@@ -8,6 +8,11 @@
     "activeUsers": "Aktive Benutzer",
     "map": "Karte",
     "enableTracking": "Tracking aktivieren",
-    "disableTracking": "Tracking deaktivieren"
+    "disableTracking": "Tracking deaktivieren",
+    "addressLookup": "Adresssuche",
+    "searchAddressHere": "Adresse hier suchen",
+    "searchRoute": "Route suchen",
+    "from": "von",
+    "to": "zu"
   }
 }

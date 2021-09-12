@@ -1,30 +1,16 @@
 <div class="">
   <div class="row">
     <div class="users col-3">
-      <!-- <div class="row mb-3 d-flex justify-content-center">
-        <button
-          type="button"
-          [disabled]="locationAccess"
-          class="btn btn-outline-secondary w-auto mx-1"
-        >
-          {{ "map.enableTracking" | translate }}
-        </button>
-        <button
-          type="button"
-          [disabled]="!locationAccess"
-          class="btn btn-outline-secondary w-auto mx-1"
-        >
-          {{ "map.disableTracking" | translate }}
-        </button>
-      </div> -->
       <div class="row">
-        <label class="mb-2" for="address-lookup">Address Lookup</label>
+        <label class="mb-2 fw-bold" for="address-lookup">{{
+          "map.addressLookup" | translate
+        }}</label>
         <input
           class="form-control"
           type="text"
           name="address-lookup"
           id="address-lookup"
-          placeholder="Search address here"
+          placeholder="{{ 'map.searchAddressHere' | translate }}"
           [(ngModel)]="address"
           (keyup)="getAddress()"
         />
@@ -37,11 +23,12 @@
               {{ address.display_name }}
             </li>
           </ul>
-          <!-- <div *ngFor="let list of address"></div> -->
         </div>
       </div>
-      <div class="row">
-        <label for="">Search Route</label>
+      <div class="row route">
+        <label class="mb-2 fw-bold" for="">{{
+          "map.searchRoute" | translate
+        }}</label>
         <div class="col-5 route-input">
           <input
             #from
@@ -49,20 +36,19 @@
             type="text"
             name="search-from"
             id="search-from"
-            placeholder="from"
+            placeholder="{{ 'map.from' | translate }}"
             [(ngModel)]="searchFrom"
             (keyup)="routeSearchInput(from.id)"
           />
-          <div *ngIf="searchResult$ | async" class="search-results">
+          <div *ngIf="searchFrom$ | async" class="search-results">
             <ul
               class="search-items"
-              *ngFor="let address of searchResult$ | async"
+              *ngFor="let address of searchFrom$ | async"
             >
               <li (click)="searchResultFrom(address)">
                 {{ address.display_name }}
               </li>
             </ul>
-            <!-- <div *ngFor="let list of address"></div> -->
           </div>
         </div>
         <div class="col-5 route-input">
@@ -72,20 +58,16 @@
             type="text"
             name="search-to"
             id="search-to"
-            placeholder="to"
+            placeholder="{{ 'map.to' | translate }}"
             [(ngModel)]="searchTo"
             (keyup)="routeSearchInput(to.id)"
           />
-          <div *ngIf="searchResult$ | async" class="search-results">
-            <ul
-              class="search-items"
-              *ngFor="let address of searchResult$ | async"
-            >
+          <div *ngIf="searchTo$ | async" class="search-results">
+            <ul class="search-items" *ngFor="let address of searchTo$ | async">
               <li (click)="searchResultTo(address)">
                 {{ address.display_name }}
               </li>
             </ul>
-            <!-- <div *ngFor="let list of address"></div> -->
           </div>
         </div>
         <div class="col-2 px-0">
@@ -99,7 +81,6 @@
       </div>
     </div>
     <div class="map-container col-9 center">
-      <!-- <h5>{{ "map.map" | translate }}</h5> -->
       <div id="map"></div>
     </div>
   </div>
